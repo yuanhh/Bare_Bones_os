@@ -15,18 +15,18 @@ KERNEL = kernel.bin
 run: $(KERNEL)
 	qemu-system-i386 -kernel $(KERNEL)
 
+%.o: %.c
+	$(CC) -c $< $(CFLAGS) -o $@
+
+%.o: %.s
+	$(AS) $< -o $@
+
 .PHONY: all clean                                                                                                                                             
 
 all: $(KERNEL)
 
 $(KERNEL): $(KERNEL_OBJ)
 	$(CC) $(LDFLAGS) $(KERNEL_OBJ) -o $(KERNEL) -lgcc
-
-%.o: %.c
-	$(CC) -c $< $(CFLAGS) -o $@
-
-%.o: %.s
-	$(AS) $< -o $@
 
 clean:
 	rm -f src/*.o $(KERNEL)
