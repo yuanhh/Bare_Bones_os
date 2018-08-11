@@ -1,8 +1,6 @@
 #ifndef MONITOR_H
 #define MONITOR_H
 
-#include "io.h"
-
 /* Hardware text mode color constants. */
 enum vga_color {
     VGA_COLOR_BLACK = 0,
