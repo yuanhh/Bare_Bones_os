@@ -32,8 +32,10 @@ enum vga_color {
 
 #define TERMINAL_COLOR 0x0700
 
-void console_clear();
+void console_clear(void);
 
-void console_write(char *string);
+void console_write(char *);
+
+void panic(char *);
 
 #endif

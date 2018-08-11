@@ -15,6 +15,12 @@ static inline uchar inb(ushort port)
 	return data;
 }
 
+static inline void cli(void)
+{
+    asm volatile("cli");
+}
+
+
 static inline void lgdt(struct segdesc *p, int size)
 {
 	volatile struct dt_reg gdtr;

@@ -55,3 +55,13 @@ void console_write(char *string)
     while (string[i])
         console_putc(string[i++]);
 }
+
+void panic(char *s)
+{
+    cli();
+
+    console_write(s);
+
+    for(;;)
+        ;
+}
