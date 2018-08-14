@@ -1,32 +1,31 @@
 CC = i686-elf-gcc
 AS = i686-elf-as
 
-CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra
-LDFLAGS = -T linker.ld -ffreestanding -O2 -nostdlib 
+CFLAGS = -ffreestanding -O2 -Wall -Wextra
+LDFLAGS = -T linker.ld
 
-KERNEL_AS = src/boot.s 		\
-			src/vectors.s	\
-			src/trapasm.s	\
+KERNEL_AS = src/boot.S 		\
+			src/x86asm.S	\
+			src/vectors.S	\
+			src/trapasm.S
 
-KERNEL_SRC = src/kernel.c	\
+KERNEL_SRC = src/main.c		\
 			 src/string.c	\
 			 src/console.c	\
 			 src/gdt.c		\
 			 src/idt.c		\
-			 src/isr.c
+			 src/trap.c		\
+			 src/cpu.c
 
-KERNEL_OBJ = $(KERNEL_SRC:.c=.o) $(KERNEL_AS:.s=.o)
+KERNEL_OBJ = $(KERNEL_SRC:.c=.o) $(KERNEL_AS:.S=.o)
 
 KERNEL = kernel.bin
 
-run: $(KERNEL)
-	qemu-system-i386 -d cpu -kernel $(KERNEL)
-
 %.o: %.c
-	$(CC) -c $< $(CFLAGS) -o $@
+	$(CC) $(CFLAGS) -c -o $@ $< 
 
-%.o: %.s
-	$(AS) $< -o $@
+%.o: %.S
+	$(AS) -c -o $@ $<
 
 .PHONY: all clean                                                                                                                                             
 

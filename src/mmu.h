@@ -10,7 +10,7 @@
         uint p : 1;     // Present
     }__attribute__((packed)); */
 
-struct dt_reg {
+struct dtreg {
     ushort size;
     uint offset;
 }__attribute__((packed));
@@ -33,9 +33,6 @@ struct gatedesc {
     uchar access;
     ushort off_high;
 }__attribute__((packed));
-
-void init_gdt(void);
-void init_idt(void);
 
 // various segment selectors.
 #define SEG_KCODE 1  // kernel code
@@ -77,5 +74,28 @@ void init_idt(void);
 #define STS_CG32    0xC     // 32-bit Call Gate
 #define STS_IG32    0xE     // 32-bit Interrupt Gate
 #define STS_TG32    0xF     // 32-bit Trap Gate
+
+// Programable Interrupt Controller
+#define PIC_MS_CMD 0x20
+#define PIC_MS_DATA 0x21
+
+#define PIC_SV_CMD 0xA0
+#define PIC_SV_DATA 0xA1
+
+// PIC Command End of Interrupt
+#define PIC_INIT 0x11
+#define PIC_EOI 0x20
+/* 
+ * i8259A definition
+ */
+#define ICW1_INIT   0x11 /* ICW1 - ICW4 needed, cascade mode, interval=8,
+                          * edge triggered. (I think interval is irrelevant
+                          * for x86.) */
+#define ICW2_MASTER 0x20 /* put IRQs 0-7 at 0x20 (above Intel reserved ints) */
+#define ICW2_SLAVE  0x28 /* put IRQs 8-15 at 0x28 */
+#define ICW3_MASTER 0x04 /* IR2 connected to slave */
+#define ICW3_SLAVE  0x02 /* slave has id 2 */
+#define ICW4_8086   0x01 /* 8086 mode, no auto-EOI, non-buffered mode,
+                          * not special fully nested mode */
 
 #endif

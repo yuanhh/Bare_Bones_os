@@ -56,7 +56,8 @@ strlen(char const *s)
 {
 	uint i;
 
-	for (i = 0; s[i]; i++);
+	for (i = 0; s[i]; i++)
+        ;
 
 	return i;
 }
@@ -77,8 +78,7 @@ strrev(char *str)
 	}
 }
 
-int
-itoa(int num, char* str, int len, int base)
+int itoa(int num, char* str, int len, int base)
 {
 	int sum = num;
 	int i = 0;
@@ -100,6 +100,7 @@ itoa(int num, char* str, int len, int base)
 	if (i == (len - 1) && sum)
 		return -1;
 	str[i] = '\0';
+
 	strrev(str);
 
 	return 0;

@@ -5,6 +5,8 @@
 
 struct segdesc gdt[NSEGS];
 
+extern void lgdt();
+
 static void set_segdesc(
         ushort sel, 
         uint base, 
@@ -25,12 +27,17 @@ static void set_segdesc(
 
 void init_gdt(void)
 {
+	struct dtreg gdtr;
+
     memset(&gdt, 0, sizeof(gdt));
 
-    set_segdesc(SEG_KCODE, 0, 0xffffffff, STA_X|STA_R, DPL_KERN);
-    set_segdesc(SEG_KDATA, 0, 0xffffffff, STA_W, DPL_KERN);
-    set_segdesc(SEG_UCODE, 0, 0xffffffff, STA_X|STA_R, DPL_USER);
-    set_segdesc(SEG_UDATA, 0, 0xffffffff, STA_W, DPL_USER);
+    set_segdesc(SEG_KCODE, 0, 0xffffffff, DPL_KERN, STA_X|STA_R);
+    set_segdesc(SEG_KDATA, 0, 0xffffffff, DPL_KERN, STA_W);
+    set_segdesc(SEG_UCODE, 0, 0xffffffff, DPL_USER, STA_X|STA_R);
+    set_segdesc(SEG_UDATA, 0, 0xffffffff, DPL_USER, STA_W);
 
-    lgdt(gdt, sizeof(gdt));
+	gdtr.size = sizeof(gdt) - 1;
+	gdtr.offset = (uint)&gdt;
+
+    lgdt(&gdtr);
 }

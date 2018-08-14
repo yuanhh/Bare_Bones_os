@@ -1,5 +1,5 @@
-#ifndef MONITOR_H
-#define MONITOR_H
+#ifndef CONSOLE_H
+#define CONSOLE_H
 
 /* Hardware text mode color constants. */
 enum vga_color {
@@ -32,10 +32,9 @@ enum vga_color {
 
 #define TERMINAL_COLOR 0x0700
 
-void console_clear(void);
-
-void console_write(char *);
-
-void panic(char *);
+void vga_init(void);
+void cputs(const char *string);
+void cprintf(const char *fmt, ...);
+void panic(char *s);
 
 #endif
