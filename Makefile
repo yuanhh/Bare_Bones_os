@@ -4,10 +4,10 @@ AS = i686-elf-as
 CFLAGS = -ffreestanding -O2 -Wall -Wextra
 LDFLAGS = -T linker.ld
 
-KERNEL_AS = src/boot.S 		\
-			src/x86asm.S	\
-			src/vectors.S	\
-			src/trapasm.S
+KERNEL_AS = src/boot.s 		\
+			src/x86asm.s	\
+			src/vectors.s	\
+			src/trapasm.s
 
 KERNEL_SRC = src/main.c		\
 			 src/string.c	\
@@ -17,14 +17,14 @@ KERNEL_SRC = src/main.c		\
 			 src/trap.c		\
 			 src/cpu.c
 
-KERNEL_OBJ = $(KERNEL_SRC:.c=.o) $(KERNEL_AS:.S=.o)
+KERNEL_OBJ = $(KERNEL_SRC:.c=.o) $(KERNEL_AS:.s=.o)
 
 KERNEL = kernel.bin
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $< 
 
-%.o: %.S
+%.o: %.s
 	$(AS) -c -o $@ $<
 
 .PHONY: all clean                                                                                                                                             
