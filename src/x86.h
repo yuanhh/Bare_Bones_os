@@ -15,24 +15,9 @@ static inline uchar inb(ushort port)
 	return data;
 }
 
-static inline void lgdt(struct segdesc *p, int size)
+static inline void cli(void)
 {
-	volatile struct dt_reg gdtr;
-
-	gdtr.size = size-1;
-	gdtr.offset = (uint)p;
-
-	asm volatile("lgdt (%0)" : : "r" (&gdtr));
-}
-
-static inline void lidt(struct gatedesc *p, int size)
-{
-	volatile struct dt_reg idtr;
-
-	idtr.size = size-1;
-	idtr.offset = (uint)p;
-
-	asm volatile("lidt (%0)" : : "r" (&idtr));
+    asm volatile("cli");
 }
 
 struct trapframe {

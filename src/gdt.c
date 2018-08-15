@@ -3,6 +3,8 @@
 #include "x86.h"
 #include "string.h"
 
+extern void lgdt(uint);
+
 struct segdesc gdt[NSEGS];
 
 static void set_segdesc(
@@ -25,6 +27,8 @@ static void set_segdesc(
 
 void init_gdt(void)
 {
+    struct dtreg gdtr;
+
     memset(&gdt, 0, sizeof(gdt));
 
     set_segdesc(SEG_KCODE, 0, 0xffffffff, STA_X|STA_R, DPL_KERN);
@@ -32,5 +36,8 @@ void init_gdt(void)
     set_segdesc(SEG_UCODE, 0, 0xffffffff, STA_X|STA_R, DPL_USER);
     set_segdesc(SEG_UDATA, 0, 0xffffffff, STA_W, DPL_USER);
 
-    lgdt(gdt, sizeof(gdt));
+    gdtr.size = sizeof(gdt) - 1;
+    gdtr.offset = (uint)&gdt;
+
+    lgdt((uint)&gdtr);
 }

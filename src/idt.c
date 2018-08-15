@@ -2,10 +2,35 @@
 #include "mmu.h"
 #include "x86.h"
 #include "string.h"
+#include "trap.h"
+#include "console.h"
+
+//extern uint vectors[];
+void (*vectors[])(void) = {
+    [T_DIVIDE] = vector0,
+    [T_DEBUG] = vector1,
+    [T_NMI] = vector2,
+    [T_BRKPT] = vector3,
+    [T_OFLOW] = vector4,
+    [T_BOUND] = vector5,
+    [T_ILLOP] = vector6,
+    [T_DEVICE] = vector7,
+    [T_DBLFLT] = vector8,
+    [T_RES1] = vector9,
+    [T_TSS] = vector10,
+    [T_SEGNP] = vector11,
+    [T_STACK] = vector12,
+    [T_GPFLT] = vector13,
+    [T_PGFLT] = vector14,
+    [T_RES2] = vector15,
+    [T_FPERR] = vector16,
+    [T_ALIGN] = vector17,
+    [T_MCHK] = vector18,
+    [T_SIMDERR] = vector19,
+};
+extern void lidt(uint);
 
 struct gatedesc idt[256];
-extern uint vectors[];
-
 // Set up a normal interrupt/trap gate descriptor.
 // - istrap: 1 for a trap (= exception) gate, 0 for an interrupt gate.
 //   interrupt gate clears FL_IF, trap gate leaves FL_IF alone
@@ -35,11 +60,17 @@ static void set_gatedesc(
 void init_idt(void)
 {
     int gate;
+    struct dtreg idtr;
 
     memset(&idt, 0, sizeof(idt));
 
-    for (gate = 0; gate < 256; gate++)
-        set_gatedesc(gate, vectors[gate], SEG_KCODE << 3, DPL_KERN, 0);
+    for (gate = 0; gate < 20; gate++)
+        set_gatedesc(gate, (uint)vectors[gate], SEG_KCODE << 3, DPL_KERN, 0);
 
-    lidt(idt, sizeof(idt));
+    idtr.size = sizeof(idt) - 1;
+    idtr.offset = (uint)&idt;
+
+    cprintf("%d %d\n", sizeof(idtr), sizeof(struct gatedesc));
+
+    lidt((uint)&idtr);
 }

@@ -5,15 +5,16 @@ CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 LDFLAGS = -T linker.ld -ffreestanding -O2 -nostdlib 
 
 KERNEL_AS = src/boot.s 		\
+			src/x86asm.s	\
 			src/vectors.s	\
-			src/trapasm.s	\
+			src/trapasm.s
 
-KERNEL_SRC = src/kernel.c	\
+KERNEL_SRC = src/main.c	\
 			 src/string.c	\
 			 src/console.c	\
 			 src/gdt.c		\
 			 src/idt.c		\
-			 src/isr.c
+			 src/trap.c
 
 KERNEL_OBJ = $(KERNEL_SRC:.c=.o) $(KERNEL_AS:.s=.o)
 

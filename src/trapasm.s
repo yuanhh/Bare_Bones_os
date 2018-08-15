@@ -1,5 +1,5 @@
-#include "mmu.h"
-
+.set SEG_KCODE, 0x1
+.set SEG_KDATA, 0x2
 # vectors.S sends all traps here.
 .globl alltraps
 alltraps:
@@ -11,7 +11,7 @@ alltraps:
     pushal
     
     # Set up data segments.
-    movw $(2 << 3), %ax
+    movw $(SEG_KDATA<<3), %ax
     movw %ax, %ds
     movw %ax, %es
   
@@ -28,5 +28,5 @@ trapret:
     popl %fs
     popl %es
     popl %ds
-    addl $0x8, %esp  # trapno and errcode
-iret
+    addl $(SEG_KCODE<<3), %esp  # trapno and errcode
+    iret

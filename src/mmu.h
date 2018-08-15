@@ -10,7 +10,7 @@
         uint p : 1;     // Present
     }__attribute__((packed)); */
 
-struct dt_reg {
+struct dtreg {
     ushort size;
     uint offset;
 }__attribute__((packed));
@@ -25,9 +25,6 @@ struct segdesc {
     uchar  base_high;           // The last 8 bits of the base.
 }__attribute__((packed));
 
-void init_gdt(void);
-void init_idt(void);
-
 struct gatedesc {
     ushort off_low;
     ushort cs;
@@ -36,6 +33,9 @@ struct gatedesc {
     uchar access;
     ushort off_high;
 }__attribute__((packed));
+
+void init_gdt(void);
+void init_idt(void);
 
 // various segment selectors.
 #define SEG_KCODE 1  // kernel code
