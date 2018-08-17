@@ -1,5 +1,6 @@
 .set SEG_KCODE, 0x1
 .set SEG_KDATA, 0x2
+
 # vectors.S sends all traps here.
 .globl alltraps
 alltraps:
@@ -14,13 +15,13 @@ alltraps:
     movw $(SEG_KDATA<<3), %ax
     movw %ax, %ds
     movw %ax, %es
-  
+
     # Call trap(tf), where tf=%esp
     pushl %esp
     call trap
     addl $4, %esp
-  
-# Return falls through to trapret...
+
+    # Return falls through to trapret...
 .globl trapret
 trapret:
     popal
@@ -28,5 +29,5 @@ trapret:
     popl %fs
     popl %es
     popl %ds
-    addl $(SEG_KCODE<<3), %esp  # trapno and errcode
+    addl $0x8, %esp  # trapno and errcode
     iret

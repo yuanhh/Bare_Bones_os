@@ -16,22 +16,31 @@ struct dtreg {
 }__attribute__((packed));
 
 struct segdesc {
-    ushort limit_low;           // The lower 16 bits of the limit.
-    ushort base_low;            // The lower 16 bits of the base.
-    uchar  base_middle;         // The next 8 bits of the base.
-    uchar  access;
-    uchar  limit_high : 4;       // The last 4 bits of the limit.
-    uchar  flags : 4;
-    uchar  base_high;           // The last 8 bits of the base.
+    uint lim_15_0 : 16;  // Low bits of segment limit
+    uint base_15_0 : 16; // Low bits of segment base address
+    uint base_23_16 : 8; // Middle bits of segment base address
+    uint type : 4;       // Segment type (see STS_ constants)
+    uint s : 1;          // 0 = system, 1 = application
+    uint dpl : 2;        // Descriptor Privilege Level
+    uint p : 1;          // Present
+    uint lim_19_16 : 4;  // High bits of segment limit
+    uint avl : 1;        // Unused (available for software use)
+    uint rsv1 : 1;       // Reserved
+    uint db : 1;         // 0 = 16-bit segment, 1 = 32-bit segment
+    uint g : 1;          // Granularity: limit scaled by 4K when set
+    uint base_31_24 : 8; // High bits of segment base address
 }__attribute__((packed));
 
 struct gatedesc {
-    ushort off_low;
-    ushort cs;
-    uchar args : 5;
-    uchar rsv1 : 3;
-    uchar access;
-    ushort off_high;
+    uint off_15_0 : 16;   // low 16 bits of offset in segment
+    uint cs : 16;         // code segment selector
+    uint args : 5;        // # args, 0 for interrupt/trap gates
+    uint rsv1 : 3;        // reserved(should be zero I guess)
+    uint type : 4;        // type(STS_{TG,IG32,TG32})
+    uint s : 1;           // must be 0 (system)
+    uint dpl : 2;         // descriptor(meaning new) privilege level
+    uint p : 1;           // Present
+    uint off_31_16 : 16;  // high bits of offset in segment
 }__attribute__((packed));
 
 void init_gdt(void);
@@ -45,13 +54,10 @@ void init_idt(void);
 #define SEG_TSS 5 // this process's task state
 
 // gdt[NSEGS] holds the above segments.
-#define NSEGS 6
+#define NSEGS 5
 
-#define PRESENT  0x80
-#define DPL_KERN 0x00 // Kernel DPL
-#define DPL_USER 0x60 // User DPL
-#define DT_APP   0x10 // Descriptor type 0 = system, 1 = application
-#define DT_SYS   0x00
+#define DPL_KERN 0x0 // Kernel DPL
+#define DPL_USER 0x3 // User DPL
 
 // Application segment type bits
 #define STA_X   0x8   // Executable segment
@@ -60,9 +66,6 @@ void init_idt(void);
 #define STA_W   0x2   // Writeable (non-executable segments)
 #define STA_R   0x2   // Readable (executable segments)
 #define STA_A   0x1   // Accessed
-
-#define SEG_GRAN 0x8 // Granularity: limit scaled by 4K when set
-#define SEG_SIZE 0x4 // 0 = 16-bit segment, 1 = 32-bit segment
 
 // System segment type bits
 #define STS_T16A    0x1     // Available 16-bit TSS
