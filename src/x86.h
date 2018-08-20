@@ -1,18 +1,17 @@
 #include "types.h"
-#include "mmu.h"
 
 static inline void outb(ushort port, uchar data)
 {
-    asm volatile ("out %0, %1" : : "a" (data), "d" (port));
+	asm volatile ("out %0, %1" : : "a" (data), "d" (port));
 }
 
 static inline uchar inb(ushort port)
 {
-    uchar data;
+	uchar data;
 
-    asm volatile ("in %1, %0" : "=a" (data) : "d" (port));
+	asm volatile ("in %1, %0" : "=a" (data) : "d" (port));
 
-    return data;
+	return data;
 }
 
 static inline void cli(void)

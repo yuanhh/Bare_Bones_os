@@ -1,87 +1,77 @@
 #include "types.h"
-#include "mmu.h"
-#include "x86.h"
-#include "string.h"
-#include "console.h"
+#include "desctable.h"
 #include "trap.h"
 
-extern void lidt(uint);
+struct gatedesc idt[256];
+struct descreg idtr;
 
-struct gatedesc idt[48];
-struct dtreg idtr;
+extern void lidtr(uint);
 
-extern uint vectors[];
+// extern uint vectors[];
+static uint (*vectors[])(void) = {
+    [T_DIVIDE] = vector0,
+    [T_DEBUG] = vector1,
+    [T_NMI] = vector2,
+    [T_BRKPT] = vector3,
+    [T_OFLOW] = vector4,
+    [T_BOUND] = vector5,
+    [T_ILLOP] = vector6,
+    [T_DEVICE] = vector7,
+    [T_DBLFLT] = vector8,
+    [T_RES1] = vector9,
+    [T_TSS] = vector10,
+    [T_SEGNP] = vector11,
+    [T_STACK] = vector12,
+    [T_GPFLT] = vector13,
+    [T_PGFLT] = vector14,
+    [T_RES2] = vector15,
+    [T_FPERR] = vector16,
+    [T_ALIGN] = vector17,
+    [T_MCHK] = vector18,
+    [T_SIMDERR] = vector19,
+    [20] = vector20,
+    [21] = vector21,
+    [22] = vector22,
+    [23] = vector23,
+    [24] = vector24,
+    [25] = vector25,
+    [26] = vector26,
+    [27] = vector27,
+    [28] = vector28,
+    [29] = vector29,
+    [30] = vector30,
+    [31] = vector31
+};
 
-// Set up a normal interrupt/trap gate descriptor.
-// - istrap: 1 for a trap (= exception) gate, 0 for an interrupt gate.
-//   interrupt gate clears FL_IF, trap gate leaves FL_IF alone
-// - sel: Code segment selector for interrupt/trap handler
-// - off: Offset in code segment for interrupt/trap handler
-// - dpl: Descriptor Privilege Level -
-//        the privilege level required for software to invoke
-//        this interrupt/trap gate explicitly using an int instruction.
 static void set_gatedesc(
-        uint gate,
+        uchar gate,
         uint off, 
         ushort sel, 
         uchar dpl,
         uint istrap)
 {
-    idt[gate].off_15_0 = off & 0xffff;
-    idt[gate].off_31_16 = (off >> 16) & 0xffff;
+    idt[gate].off_low = off & 0xffff;
+    idt[gate].off_high = (off >> 16) & 0xffff;
 
     idt[gate].cs = sel; // code segment selector
     idt[gate].args = 0; // 0
     idt[gate].rsv1 = 0; // reserved
 
-    //access
-    idt[sel].type = (istrap) ? STS_TG32 : STS_IG32;
-    idt[sel].s = 0;
-    idt[sel].dpl = dpl;
-    idt[sel].p = 1;
-}
-
-void remap_pic(void)
-{
-    uchar picm, pics;
-
-    picm = inb(PIC_MS_IO);
-    pics = inb(PIC_SV_IO);
-
-	outb(PIC_MS_CMD, ICW1_INIT);
-	outb(PIC_SV_CMD, ICW1_INIT);
-	outb(PIC_MS_IO, ICW2_MASTER);
-	outb(PIC_SV_IO, ICW2_SLAVE);
-	outb(PIC_MS_IO, ICW3_MASTER);
-	outb(PIC_SV_IO, ICW3_SLAVE);
-	outb(PIC_MS_IO, ICW4_8086);
-	outb(PIC_SV_IO, ICW4_8086);
-
-	outb(PIC_MS_IO, 0x0);
-	outb(PIC_SV_IO, 0x0);
-}
-
-void picinit(void)
-{
-    // mask all interrupts
-    outb(PIC_MS_IO, 0xFF);
-    outb(PIC_SV_IO, 0xFF);
+    idt[gate].type = (istrap) ? STS_TG32 : STS_IG32;
+    idt[gate].s = 0;
+    idt[gate].dpl = dpl;
+    idt[gate].p = 1;
 }
 
 void init_idt(void)
 {
-    int gate = 0;
+    uint gate;
 
-    memset(&idt, 0, sizeof(idt));
-    
-    for (gate = 0; gate < 48; gate++)
-        set_gatedesc(gate, vectors[gate], SEG_KCODE << 3, DPL_KERN, 0);
+    for (gate = 0; gate < 32; gate++)
+        set_gatedesc(gate, (uint)vectors[gate], SEG_KCODE << 3, DPL_KERN, 0);
 
-    remap_pic();
-    //picinit();
+	idtr.size = sizeof(idt) - 1;
+	idtr.offset = (uint)&idt;
 
-    idtr.size = sizeof(idt) - 1;
-    idtr.offset = (uint)idt;
-
-    lidt((uint)&idtr);
+    lidtr((uint)&idtr);
 }

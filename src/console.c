@@ -87,7 +87,7 @@ void vga_init(void)
 
 void panic(char *s)
 {
-    //cli();
+    cli();
 
     cputs(s);
 

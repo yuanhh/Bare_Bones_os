@@ -1,5 +1,5 @@
-#ifndef MONITOR_H
-#define MONITOR_H
+#ifndef CONSOLE_H
+#define CONSOLE_H
 
 /* Hardware text mode color constants. */
 enum vga_color {
