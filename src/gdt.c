@@ -1,4 +1,5 @@
-#include "gdt.h"
+#include "string.h"
+#include "desctable.h"
 
 struct segdesc gdt[5];
 struct descreg gdtr;
@@ -33,7 +34,6 @@ static void set_segdesc(
 
 void init_gdt(void)
 {
-    set_segdesc(0, 0, 0, 0, 0);
     set_segdesc(SEG_KCODE, 0, 0xffffffff, DPL_KERN, STA_X|STA_R);
     set_segdesc(SEG_KDATA, 0, 0xffffffff, DPL_KERN, STA_W);
     set_segdesc(SEG_UCODE, 0, 0xffffffff, DPL_USER, STA_X|STA_R);

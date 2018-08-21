@@ -6,9 +6,8 @@ int main(void)
 {
     vga_init();
 
+    init_gdt();
     init_idt();
-
-    cprintf("int 3 = %d\n", 0x3);
 
     asm volatile ("int $0x3");
     asm volatile ("int $0x4");

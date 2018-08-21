@@ -10,6 +10,7 @@ KERNEL_AS = boot.s		\
 KERNEL_C = 	main.c 		\
 			string.c	\
 			console.c 	\
+			gdt.c		\
 			idt.c		\
 			trap.c		\
 
