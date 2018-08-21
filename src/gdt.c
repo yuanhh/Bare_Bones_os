@@ -34,10 +34,10 @@ static void set_segdesc(
 
 void init_gdt(void)
 {
-    set_segdesc(SEG_KCODE, 0, 0xffffffff, DPL_KERN, STA_X|STA_R);
-    set_segdesc(SEG_KDATA, 0, 0xffffffff, DPL_KERN, STA_W);
-    set_segdesc(SEG_UCODE, 0, 0xffffffff, DPL_USER, STA_X|STA_R);
-    set_segdesc(SEG_UDATA, 0, 0xffffffff, DPL_USER, STA_W);
+    set_segdesc(SEG_KCODE, 0, 0xffffffff, STA_X|STA_R, DPL_KERN);
+    set_segdesc(SEG_KDATA, 0, 0xffffffff, STA_W, DPL_KERN);
+    set_segdesc(SEG_UCODE, 0, 0xffffffff, STA_X|STA_R, DPL_USER);
+    set_segdesc(SEG_UDATA, 0, 0xffffffff, STA_W, DPL_USER);
 
     gdtr.size = sizeof(gdt) - 1;
     gdtr.offset = (uint)&gdt;
