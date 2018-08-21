@@ -2,14 +2,14 @@
 .global vector\trapno
 vector\trapno:
     pushl $0
-    pushl \trapno
+    pushl $\trapno
     jmp alltraps
 .endm
 
 .macro vector_err trapno
 .global vector\trapno
     vector\trapno:
-    pushl \trapno
+    pushl $\trapno
     jmp alltraps
 .endm
 
