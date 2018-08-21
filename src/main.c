@@ -1,6 +1,7 @@
 #include "types.h"
 #include "console.h"
 #include "desctable.h"
+#include "timer.h"
 
 int main(void)
 {
@@ -9,8 +10,7 @@ int main(void)
     init_gdt();
     init_idt();
 
-    asm volatile ("int $0x3");
-    asm volatile ("int $0x4");
+    init_timer(50);
 
-    return 0xDEADBABA;
+    return 0;
 }

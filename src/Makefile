@@ -13,6 +13,7 @@ KERNEL_C = 	main.c 		\
 			gdt.c		\
 			idt.c		\
 			trap.c		\
+			timer.c		\
 
 KERNEL_OBJ = $(KERNEL_C:.c=.o) $(KERNEL_AS:.s=.o)
 
