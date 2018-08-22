@@ -14,6 +14,11 @@ static inline uchar inb(ushort port)
 	return data;
 }
 
+static inline void sti(void)
+{
+    asm volatile("sti");
+}
+
 static inline void cli(void)
 {
     asm volatile("cli");

@@ -14,6 +14,8 @@ KERNEL_C = 	main.c 		\
 			idt.c		\
 			trap.c		\
 			timer.c		\
+			paging.c	\
+			rtc.c
 
 KERNEL_OBJ = $(KERNEL_C:.c=.o) $(KERNEL_AS:.s=.o)
 

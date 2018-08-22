@@ -20,7 +20,6 @@ void trap(struct trapframe* tf)
         switch (irq) {
             case IRQ_TIMER:
                 ticks++;
-                cprintf("tick: %d\n", ticks);
                 break;
             default:
                 cprintf("unhandled interrupt: %d\n", irq);

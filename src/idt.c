@@ -115,5 +115,5 @@ void init_idt(void)
 
     lidtr((uint)&idtr);
 
-    asm volatile ("sti");
+    sti();
 }
