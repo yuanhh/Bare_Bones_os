@@ -13,7 +13,5 @@ int main(void)
 
     init_timer(50);
 
-    detect_memory();
-
     return 0;
 }
