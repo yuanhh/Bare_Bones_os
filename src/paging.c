@@ -6,14 +6,10 @@
 #include "string.h"
 
 uint *kpgdir;
-struct {
-    struct pagelist *freelist;
-} kmem;
+static struct pagelist *freelist;
 
 uint totmem;
 static uint basemem;
-
-extern char end[];
 
 static void detect_memory(void)
 {
@@ -32,38 +28,36 @@ static void detect_memory(void)
     cprintf("Extended memory:   %d KB\n", extmem);
 }
 
-void kfree(char *pa)
+/* void kfree(char *pa)
 {
     struct pagelist *p;
 
-    if((uint)pa % PGSIZE || pa < end || pa >= PHYSTOP)
+    if ((uint)pa % PGSIZE)
         panic("kfree");
 
     memset(pa, 1, PGSIZE);
 
     p = (struct pagelist *)pa;
-    p->next = kmem.freelist;
-    kmem.freelist = p;
+    p->next = freelist;
+    freelist = p;
 }
 
-void freerange(void *start, void *end)
+void freerange(uint start, uint end)
 {
-    char *p;
+    uint p;
 
-    p = (char *)PGROUNDUP((uint)start);
-
-    for (; p + PGSIZE <= (char *) end; p += PGSIZE)
-        kfree(p);
-}
+    p = (start + (PGSIZE - 1)) & ~(PGSIZE - 1);
+    for (; p + PGSIZE <= end; p += PGSIZE)
+        kfree((char *)p);
+} */
 
 char *kalloc(void)
 {
     struct pagelist *p;
 
-    p = kmem.freelist;
-
+    p = freelist;
     if (p)
-        kmem.freelist = p->next;
+        freelist = p->next;
 
     return (char *)p;
 }
@@ -71,9 +65,4 @@ char *kalloc(void)
 void kinit(void)
 {
     detect_memory();
-    
-    freerange(end, (void *)(4*1024*1024));
-
-    kpgdir = (uint *)kalloc();
-    memset(kpgdir, 0, PGSIZE);
 }
