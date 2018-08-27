@@ -19,6 +19,7 @@ void trap(struct trapframe* tf)
 
         switch (irq) {
             case IRQ_TIMER:
+                cprintf("ticks: %d\n", ticks);
                 ticks++;
                 break;
             default:

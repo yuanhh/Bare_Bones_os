@@ -5,15 +5,17 @@
 #include "paging.h"
 #include "string.h"
 
-uint *kern_pgdir;
+uint *kpgdir;
+struct {
+    struct pagelist *freelist;
+} kmem;
 
 uint totmem;
 static uint basemem;
 
-// end of kernel prog
 extern char end[];
 
-void detect_memory(void)
+static void detect_memory(void)
 {
     uint extmem;
 
@@ -30,25 +32,48 @@ void detect_memory(void)
     cprintf("Extended memory:   %d KB\n", extmem);
 }
 
-static void *kalloc(uint sz)
+void kfree(char *pa)
 {
-    static char *nextfree;
+    struct pagelist *p;
 
-    if (!nextfree)
-        nextfree = PGROUNDUP((char *)end);
+    if((uint)pa % PGSIZE || pa < end || pa >= PHYSTOP)
+        panic("kfree");
 
-    if (sz != 0)
-        nextfree = PGROUNDUP(nextfree + sz);
+    memset(pa, 1, PGSIZE);
 
-    return nextfree;
+    p = (struct pagelist *)pa;
+    p->next = kmem.freelist;
+    kmem.freelist = p;
 }
 
-void init_paging(void)
+void freerange(void *start, void *end)
 {
+    char *p;
 
+    p = (char *)PGROUNDUP((uint)start);
+
+    for (; p + PGSIZE <= (char *) end; p += PGSIZE)
+        kfree(p);
+}
+
+char *kalloc(void)
+{
+    struct pagelist *p;
+
+    p = kmem.freelist;
+
+    if (p)
+        kmem.freelist = p->next;
+
+    return (char *)p;
+}
+
+void kinit(void)
+{
     detect_memory();
+    
+    freerange(end, (void *)(4*1024*1024));
 
-    kern_pgdir = (uint *)kalloc(PGSIZE);
-    memset(kern_pgdir, 0, PGSIZE);
-
+    kpgdir = (uint *)kalloc();
+    memset(kpgdir, 0, PGSIZE);
 }

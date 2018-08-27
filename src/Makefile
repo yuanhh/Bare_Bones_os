@@ -13,7 +13,7 @@ KERNEL_C = 	main.c 		\
 			gdt.c		\
 			idt.c		\
 			trap.c		\
-			timer.c		\
+			pit.c		\
 			paging.c	\
 			rtc.c
 

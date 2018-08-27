@@ -1,8 +1,6 @@
 #include "types.h"
 #include "console.h"
 #include "desctable.h"
-#include "timer.h"
-#include "paging.h"
 
 int main(void)
 {
@@ -11,7 +9,9 @@ int main(void)
     init_gdt();
     init_idt();
 
-    init_timer(50);
+    //pit8253_timerinit();
+    asm volatile("int $0x0");
+    asm volatile("int $0x3");
 
     return 0;
 }
