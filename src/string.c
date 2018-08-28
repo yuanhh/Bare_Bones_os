@@ -7,7 +7,7 @@ void* memset(void *dst, int c, uint n)
     c &= 0xff;
 
     while (n-- > 0)
-        *d++ = c;
+        *d++ = (char)c;
 
     return dst;
 }

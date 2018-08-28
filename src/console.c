@@ -45,15 +45,15 @@ static void cputc(char c)
         vga[pos++] = (c & 0xff) | TERMINAL_COLOR;
     }
 
-    if (pos < 0 || pos > VGA_WIDTH * VGA_HEIGHT) {
-        panic("pos overflow");
-    }
-
     if (pos / VGA_WIDTH >= 24) {
         memmove(vga, vga + VGA_WIDTH, sizeof(vga[0])*23*80);
         pos -= VGA_WIDTH;
         memset(vga + pos, 0, sizeof(vga[0])*(24*80 - pos));
     }
+
+    /* if (pos < 0 || pos > VGA_WIDTH * VGA_HEIGHT) {
+        panic("pos overflow");
+    } */
 
     set_cursor(pos);
 

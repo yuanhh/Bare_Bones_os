@@ -30,6 +30,7 @@ void trap(struct trapframe* tf)
         switch (tf->trapno) {
             default:
                 cprintf("unhandled interrupt: %d\n", tf->trapno);
+                panic("trap");
                 break;
         }
     }

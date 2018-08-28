@@ -6,8 +6,6 @@
 #define RTC_IO1 0x70
 #define RTC_IO2 0x71
 
-#define EXTPHYSMEM 0x100000
-
 #define	MC_NVRAM_START	0xe	/* start of NVRAM: offset 14 */
 #define	MC_NVRAM_SIZE	50	/* 50 bytes of NVRAM */
 

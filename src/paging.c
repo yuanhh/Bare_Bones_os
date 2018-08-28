@@ -5,53 +5,27 @@
 #include "paging.h"
 #include "string.h"
 
-uint *kpgdir;
-static struct pagelist *freelist;
+struct pagelist {
+    struct pagelist *next;
+};
 
-uint totmem;
-static uint basemem;
+struct pagelist *freelist;
 
-static void detect_memory(void)
-{
-    uint extmem;
-
-    basemem = lnvram(NVRAM_BASELO) | lnvram(NVRAM_BASEHI) << 8;
-    extmem = lnvram(NVRAM_EXTLO) | lnvram(NVRAM_EXTHI) << 8;
-
-    if (extmem)
-        totmem = (EXTPHYSMEM / 1024) + extmem;
-    else
-        totmem = basemem;
-
-    cprintf("Physical memory:   %d KB\n", totmem);
-    cprintf("Base memory:       %d KB\n", basemem);
-    cprintf("Extended memory:   %d KB\n", extmem);
-}
-
-/* void kfree(char *pa)
+void kfree(uint pa)
 {
     struct pagelist *p;
 
-    if ((uint)pa % PGSIZE)
+    if (pa % PGSIZE)
         panic("kfree");
 
-    memset(pa, 1, PGSIZE);
+    memset((void *)pa, 1, PGSIZE);
 
     p = (struct pagelist *)pa;
     p->next = freelist;
     freelist = p;
 }
 
-void freerange(uint start, uint end)
-{
-    uint p;
-
-    p = (start + (PGSIZE - 1)) & ~(PGSIZE - 1);
-    for (; p + PGSIZE <= end; p += PGSIZE)
-        kfree((char *)p);
-} */
-
-char *kalloc(void)
+uint kalloc(void)
 {
     struct pagelist *p;
 
@@ -59,10 +33,23 @@ char *kalloc(void)
     if (p)
         freelist = p->next;
 
-    return (char *)p;
+    return (uint)p;
+}
+
+void freerange(uint start, uint end)
+{
+    uint pa;
+    pa = PGROUNDUP(start);
+
+    for (; pa + PGSIZE <= end; pa += PGSIZE)
+        kfree(pa);
 }
 
 void kinit(void)
 {
-    detect_memory();
+    extern uint kend;
+
+    cprintf("start kmem init at %p\n", &kend);
+
+    freerange((uint)&kend, 0x1000000);
 }

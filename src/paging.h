@@ -4,17 +4,16 @@
 #include "types.h"
 
 #define PGSIZE 4096
+#define EXTPHYSMEM 0x100000
+
 
 // first PGSIZE -1 for already aligned input address
-#define PGROUNDUP(sz) (((sz)+PGSIZE-1) & ~(PGSIZE-1))
-
-struct pagelist {
-    struct pagelist *next;
-};
+#define PGROUNDUP(a) (((a)+PGSIZE-1) & ~(PGSIZE-1))
+#define PGROUNDDOWN(a) (((a)) & ~(PGSIZE-1))
 
 void kinit(void);
-char *kalloc(void);
-void kfree(char *pa);
-void freerange(uint start, uint end);
+uint kalloc(void);
+void kfree(uint pa);
+void freerange(uint, uint);
 
 #endif

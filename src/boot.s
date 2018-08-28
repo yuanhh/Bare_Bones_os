@@ -7,7 +7,7 @@
 
 .p2align 2
 .text
-multiboot:
+mboot:
     .long MAGIC
     .long FLAGS
     .long CHECKSUM
