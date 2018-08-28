@@ -13,6 +13,7 @@ SECTIONS
     {
        *(.rodata)
     }
+    PROVIDE(kdata = .);
 
     .data BLOCK(4K) : ALIGN (4K)
     {
@@ -24,6 +25,5 @@ SECTIONS
         *(COMMON)
         *(.bss)
     }
-
     PROVIDE(kend = .);
 } 

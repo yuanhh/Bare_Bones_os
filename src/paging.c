@@ -1,55 +1,36 @@
 #include "types.h"
 #include "x86.h"
-#include "console.h"
-#include "rtc.h"
-#include "paging.h"
 #include "string.h"
+#include "console.h"
+#include "kalloc.h"
+#include "paging.h"
 
-struct pagelist {
-    struct pagelist *next;
+pde_t *kpgdir;
+
+static struct kmap {
+    void *virt;
+    uint phys_start;
+    uint phys_end;
+    int perm;
+} kmap[] = {
+    { (void*)KERNBASE, 0,             EXTMEM,    PTE_W}, // I/O space
+    { (void*)KERNLINK, V2P(KERNLINK), V2P(data), 0},     // kern text+rodata
+    { (void*)data,     V2P(data),     PHYSTOP,   PTE_W}, // kern data+memory
+    { (void*)DEVSPACE, DEVSPACE,      0,         PTE_W}, // more devices
 };
 
-struct pagelist *freelist;
-
-void kfree(uint pa)
-{
-    struct pagelist *p;
-
-    if (pa % PGSIZE)
-        panic("kfree");
-
-    memset((void *)pa, 1, PGSIZE);
-
-    p = (struct pagelist *)pa;
-    p->next = freelist;
-    freelist = p;
-}
-
-uint kalloc(void)
-{
-    struct pagelist *p;
-
-    p = freelist;
-    if (p)
-        freelist = p->next;
-
-    return (uint)p;
-}
-
-void freerange(uint start, uint end)
-{
-    uint pa;
-    pa = PGROUNDUP(start);
-
-    for (; pa + PGSIZE <= end; pa += PGSIZE)
-        kfree(pa);
-}
-
-void kinit(void)
+pde_t* kinit(void)
 {
     extern uint kend;
+    pde_t *pgdir;
 
     cprintf("start kmem init at %p\n", &kend);
 
-    freerange((uint)&kend, 0x1000000);
+    freerange((uint)&kend, PHYSTOP);
+
+    pgdir = kalloc();
+    if (!pgdir)
+        return 0;
+
+    memset(pgdir, 0, PGSIZE);
 }

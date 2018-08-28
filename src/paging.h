@@ -4,16 +4,13 @@
 #include "types.h"
 
 #define PGSIZE 4096
-#define EXTPHYSMEM 0x100000
 
+#define EXTMEM  0x100000            // Start of extended memory
+#define PHYSTOP 0xE000000           // Top physical memory
+#define DEVSPACE 0xFE000000         // Other devices are at high addresses
 
 // first PGSIZE -1 for already aligned input address
 #define PGROUNDUP(a) (((a)+PGSIZE-1) & ~(PGSIZE-1))
 #define PGROUNDDOWN(a) (((a)) & ~(PGSIZE-1))
-
-void kinit(void);
-uint kalloc(void);
-void kfree(uint pa);
-void freerange(uint, uint);
 
 #endif
