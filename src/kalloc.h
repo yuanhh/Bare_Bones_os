@@ -4,8 +4,8 @@
 #include "types.h"
 
 void kinit(void);
-uint kalloc(void);
-void kfree(uint pa);
-void freerange(uint, uint);
+char *kalloc(void);
+void kfree(char *pa);
+void freerange(char *, char *);
 
 #endif

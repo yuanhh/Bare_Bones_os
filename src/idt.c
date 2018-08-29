@@ -114,6 +114,4 @@ void init_idt(void)
 	idtr.offset = (uint)&idt;
 
     lidtr((uint)&idtr);
-
-    sti();
 }

@@ -1,4 +1,4 @@
-CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -ffreestanding
+CFLAGS = -nostdlib -nostdinc -fno-builtin -fno-stack-protector -ffreestanding
 LDFLAGS = -Tlink.ld
 ASFLAGS = -felf
 
@@ -14,7 +14,7 @@ KERNEL_C = 	main.c 		\
 			idt.c		\
 			trap.c		\
 			pit.c		\
-			rtc.c		\
+			kalloc.c	\
 			paging.c
 
 KERNEL_OBJ = $(KERNEL_C:.c=.o) $(KERNEL_AS:.s=.o)

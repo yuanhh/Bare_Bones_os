@@ -10,11 +10,11 @@ struct pagelist {
 
 struct pagelist *freelist;
 
-void kfree(uint pa)
+void kfree(char *pa)
 {
     struct pagelist *p;
 
-    if (pa % PGSIZE)
+    if ((uint)pa % PGSIZE)
         panic("kfree");
 
     memset((void *)pa, 1, PGSIZE);
@@ -24,7 +24,7 @@ void kfree(uint pa)
     freelist = p;
 }
 
-uint kalloc(void)
+char *kalloc(void)
 {
     struct pagelist *p;
 
@@ -32,14 +32,14 @@ uint kalloc(void)
     if (p)
         freelist = p->next;
 
-    return (uint)p;
+    return (char *)p;
 }
 
-void freerange(uint start, uint end)
+void freerange(void *vstart, void *vend)
 {
-    uint pa;
-    pa = PGROUNDUP(start);
+    char *pa;
 
-    for (; pa + PGSIZE <= end; pa += PGSIZE)
+    pa = (char *)PGROUNDUP((uint)vstart);
+    for (; pa + PGSIZE <= (char *)vend; pa += PGSIZE)
         kfree(pa);
 }
