@@ -3,6 +3,8 @@
 
 #include "types.h"
 
+#define NELEM(x) (sizeof(x)/sizeof((x)[0]))
+
 void* memset(void *dst,  int c, uint n);
 void* memmove(void *dst, const void *src, uint n);
 void* memcpy(void *dst, const void *src, uint n);
