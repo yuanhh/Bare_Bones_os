@@ -3,24 +3,17 @@
 
 #include "types.h"
 
+#define CR0_PG 0x80000000
 #define PGSIZE 4096
 
 // Memory layout
-#define EXTMEM  0x100000            // Start of extended memory
-#define PHYSTOP 0xE000000           // Top physical memory
-#define DEVSPACE 0xFE000000         // Other devices are at high addresses
-
-// Key addresses for address space layout (see kmap in vm.c for layout)
-#define KERNBASE 0x80000000         // First kernel virtual address
-#define KERNLINK (KERNBASE+EXTMEM)  // Address where kernel is linked
+#define EXTMEM   0x100000            // Start of extended memory
+#define PHYSTART 0x0
+#define PHYSTOP  0x1000000           // Top physical memory
 
 // first PGSIZE -1 for already aligned input address
 #define PGROUNDUP(a) (((a)+PGSIZE-1) & ~(PGSIZE-1))
 #define PGROUNDDOWN(a) (((a)) & ~(PGSIZE-1))
-
-// identicle mapping from linear address to virtual address
-#define V2P(a) ((uint) (a) - KERNBASE)
-#define P2V(a) ((void *) (a) + KERNBASE)
 
 // Page table/directory entry flags.
 #define PTE_P           0x001   // Present

@@ -31,7 +31,7 @@ link:
 	gcc $(CFLAGS) -c -o $@ $<
 
 .s.o:
-	as --32 $(ASFLAG) -o $@ $<
+	as $(ASFLAG) -o $@ $<
 
 .PHONY: clean
 clean:

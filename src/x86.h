@@ -29,6 +29,20 @@ static inline void lcr3(uint pa)
     asm volatile("movl %0, %%cr3" : : "r" (pa));
 }
 
+static inline uint scr0(void)
+{
+    uint cr0;
+
+    asm volatile("mov %%cr0, %0" : "=r" (cr0));
+
+    return cr0;
+}
+
+static inline void lcr0(uint cr0)
+{
+    asm volatile("mov %0, %%cr0" : : "r" (cr0));
+}
+
 struct trapframe {
     // registers as pushed by pusha
     uint edi;
