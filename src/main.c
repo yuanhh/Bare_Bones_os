@@ -8,13 +8,12 @@
 int main(void)
 {
     vga_init();
-
     init_gdt();
+    init_paging();
+
     //init_idt();
 
     //init_pit();
-
-    init_paging();
 
     return 0;
 }

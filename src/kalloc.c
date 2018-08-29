@@ -17,8 +17,6 @@ void kfree(uint pa)
     if (pa % PGSIZE)
         panic("kfree");
 
-    memset((void *)pa, 1, PGSIZE);
-
     p = (struct pagelist *)pa;
     p->next = freelist;
     freelist = p;

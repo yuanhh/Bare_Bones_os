@@ -43,7 +43,7 @@ int mappages(pde_t *pgdir, uint va, uint sz, int perm)
     for (; va_st + PGSIZE <= va_end; va_st += PGSIZE, va += PGSIZE) {
         pte = getpage(pgdir, va_st, 1);
         if (!pte)
-            return 0;
+            return -1;
         if (*pte & PTE_P)
             panic("remap");
         *pte = va | perm | PTE_P;
@@ -61,9 +61,21 @@ void switchvm(pde_t *pgdir)
     lcr0(cr0);
 }
 
+static struct kmap {
+    uint pa_st;
+    uint pa_end;
+    int perm;
+} kmap [] = {
+    {PHYSTART,      EXTMEM,         PTE_W},
+    {EXTMEM,        (uint)kdata,    0},
+    {(uint)kdata,   PHYSTOP,        PTE_W},
+};
+
 void init_paging(void)
 {
-    freerange((uint)kend, PHYSTOP);
+    struct kmap *k;
+
+    freerange(PHYSTART, PHYSTOP);
 
     kpgdir = (pde_t *)kalloc();
     if (!kpgdir)
@@ -71,7 +83,10 @@ void init_paging(void)
 
     memset(kpgdir, 0, PGSIZE);
 
-    mappages(kpgdir, PHYSTART, PHYSTOP, PTE_U);
+    for (k = kmap; k < &kmap[NELEM(kmap)]; k++)
+        if (mappages(kpgdir, k->pa_st, k->pa_end - k->pa_st, k->perm) < 0) {
+            panic("kmap");
+        }
 
     switchvm(kpgdir);
 
