@@ -7,9 +7,13 @@
 #define PGSIZE 4096
 
 // Memory layout
-#define EXTMEM   0x100000            // Start of extended memory
 #define PHYSTART 0x0
+#define EXTMEM   0x100000            // Start of extended memory
 #define PHYSTOP  0x1000000           // Top physical memory
+#define DEVSPACE 0xFE000000
+
+#define V2P(a) (uint)(a)
+#define P2V(a) (void *)(a)
 
 // first PGSIZE -1 for already aligned input address
 #define PGROUNDUP(a) (((a)+PGSIZE-1) & ~(PGSIZE-1))
@@ -40,6 +44,8 @@
 
 #define NPDENTRIES 1024
 
+pte_t *walkpgdir(pde_t *pgdir, uint pa, int alloc);
+int mappages(pde_t *pgdir, uint pa, uint sz, int perm);
 void init_paging(void);
 
 #endif
