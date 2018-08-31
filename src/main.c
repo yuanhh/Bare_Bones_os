@@ -11,9 +11,13 @@ int main(void)
     init_gdt();
     init_paging();
 
-    //init_idt();
+    init_idt();
+    init_pit();
 
-    //init_pit();
+    sti();
+
+    uint *ptr = (uint *)0xA0000000;
+    uint do_page_fault = *ptr;
 
     return 0;
 }

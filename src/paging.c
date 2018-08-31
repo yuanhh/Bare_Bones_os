@@ -9,7 +9,7 @@ extern char kend[];
 extern char kdata[];
 pde_t *kpgdir;
 
-pte_t *getpage(pde_t *pgdir, uint va, int alloc)
+pte_t *walkpgdir(pde_t *pgdir, uint va, int alloc)
 {
     pde_t *pde;
     pte_t *pte;
@@ -41,7 +41,7 @@ int mappages(pde_t *pgdir, uint va, uint sz, int perm)
     va_end = PGROUNDDOWN(va + sz - 1);
 
     for (; va_st + PGSIZE <= va_end; va_st += PGSIZE, va += PGSIZE) {
-        pte = getpage(pgdir, va_st, 1);
+        pte = walkpgdir(pgdir, va_st, 1);
         if (!pte)
             return -1;
         if (*pte & PTE_P)
@@ -51,14 +51,9 @@ int mappages(pde_t *pgdir, uint va, uint sz, int perm)
     return 0;
 }
 
-void switchvm(pde_t *pgdir)
+void switchkvm(pde_t *pgdir)
 {
-    uint cr0;
-
     lcr3((uint)pgdir);
-    cr0 = scr0();
-    cr0 |= CR0_PG;
-    lcr0(cr0);
 }
 
 static struct kmap {
@@ -73,9 +68,10 @@ static struct kmap {
 
 void init_paging(void)
 {
+    uint cr0;
     struct kmap *k;
 
-    freerange(PHYSTART, PHYSTOP);
+    freerange((uint)kend, PHYSTOP);
 
     kpgdir = (pde_t *)kalloc();
     if (!kpgdir)
@@ -88,7 +84,11 @@ void init_paging(void)
             panic("kmap");
         }
 
-    switchvm(kpgdir);
+    switchkvm(kpgdir);
+
+    cr0 = scr0();
+    cr0 |= CR0_PG;
+    lcr0(cr0);
 
     cprintf("paging start!\n");
 }
